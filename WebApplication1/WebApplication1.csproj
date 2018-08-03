@@ -90,6 +90,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AlphaController.cs" />
+    <Compile Include="Models\ReplyOfAPI.cs" />
     <Compile Include="Models\HotelModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

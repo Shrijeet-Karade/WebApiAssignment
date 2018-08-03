@@ -10,7 +10,7 @@ namespace WebApplication1.Controllers
 {
     public class AlphaController : ApiController
     {
-        List<HotelModel> HotelDetails = new List<HotelModel>()
+        private static List<HotelModel> _HotelDetails = new List<HotelModel>()
         {
             new HotelModel {Id=1,Name="Paradise", CityCode=440027,Address="nagpur",NumberOfRoomsAvailable=2 },
             new HotelModel {Id=2,Name="Ashok", CityCode=4564512,Address="pune", NumberOfRoomsAvailable=5},
@@ -19,32 +19,82 @@ namespace WebApplication1.Controllers
         [ HttpGet ]
         public IEnumerable<HotelModel> GetHotelDetails()
         {
-            return HotelDetails;
+            return _HotelDetails;
+
         }
+        [HttpGet]
         public HotelModel SearchHotel(int Id)
         {
-            HotelModel object1 = new HotelModel();
-            for (int index = 0; index < HotelDetails.Count; index++)
+            HotelModel objectOfGET = new HotelModel();
+            for (int index = 0; index < _HotelDetails.Count; index++)
             {
-                if(HotelDetails[index].Id==Id)
+                if(_HotelDetails[index].Id==Id)
                 {
-                    object1.Id = Id;
-                    object1.Name = HotelDetails[index].Name;
-                    object1.CityCode = HotelDetails[index].CityCode;
-                    object1.Address = HotelDetails[index].Address;
-                    object1.NumberOfRoomsAvailable = HotelDetails[index].NumberOfRoomsAvailable;
+                    objectOfGET.Id = Id;
+                    objectOfGET.Name = _HotelDetails[index].Name;
+                    objectOfGET.CityCode = _HotelDetails[index].CityCode;
+                    objectOfGET.Address = _HotelDetails[index].Address;
+                    objectOfGET.NumberOfRoomsAvailable = _HotelDetails[index].NumberOfRoomsAvailable;
                     break;
                 }
             }
-            return object1;
+            return objectOfGET;
         }
         [HttpPost]
-        public HotelModel CreateHotel(int Id)
+        public HotelModel CreateHotel(HotelModel objectOfPOST)
         {
-            HotelModel object2 = new HotelModel();
+           if(objectOfPOST!=null)
+            {
+                _HotelDetails.Add(objectOfPOST);
+                return objectOfPOST;
+            }
+            else
+            {
+                objectOfPOST = null;
+                return objectOfPOST;
+            }
             
-
-            return object2;
+            
+        }
+        [HttpPut]
+        public ReplyOfAPI UpdateHotelDetails(int id, HotelModel hotelModel)
+        {
+            ReplyOfAPI Reply = new ReplyOfAPI();
+            try
+            {
+                HotelModel findHotelDetails = new HotelModel();
+                findHotelDetails = _HotelDetails.Find(HotelName => HotelName.Id.Equals(id));
+                if (findHotelDetails != null)
+                {
+                    findHotelDetails.Id = hotelModel.Id; 
+                    findHotelDetails.CityCode = hotelModel.CityCode;
+                    findHotelDetails.Address = hotelModel.Address;
+                    findHotelDetails.NumberOfRoomsAvailable = hotelModel.NumberOfRoomsAvailable;
+                    findHotelDetails.Name = hotelModel.Name;           
+                }
+            }
+            catch (Exception ex)
+            {
+                Reply.ApiStatus = "Failed";
+                Reply.StatusCode = StatusNumber.Failed;
+                Reply.Message = ex.Message;
+            }
+            return Reply;
+        }
+        [HttpDelete]
+        public HttpResponseMessage DeleteHotel(int id)
+        {
+            HotelModel HotelToBeDeleted = new HotelModel();
+            HotelToBeDeleted = _HotelDetails.Find(Hotel => Hotel.Id.Equals(id));
+            if (HotelToBeDeleted != null)
+            {
+                _HotelDetails.RemoveAt(HotelToBeDeleted.Id - 1);
+               return Request.CreateResponse(HttpStatusCode.Found, _HotelDetails);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, "Invalid ID");
+            }
         }
 
     }
